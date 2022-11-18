@@ -1,0 +1,8 @@
+resolver:
+  url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/20/0.yaml
+
+# User packages to be built.
+packages:
+- .
+# Dependency packages to be pulled from upstream that are not in the resolver.
+# extra-deps: []

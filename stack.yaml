@@ -29,7 +29,32 @@ resolver:
 #   subdirs:
 #   - auto-update
 #   - wai
-packages: []
+packages:
+- Day01/haskell
+- Day02/haskell
+- Day03/haskell
+- Day04/haskell
+- Day05/haskell
+- Day06/haskell
+- Day07/haskell
+- Day08/haskell
+- Day09/haskell
+- Day10/haskell
+- Day11/haskell
+- Day12/haskell
+- Day13/haskell
+- Day14/haskell
+- Day15/haskell
+- Day16/haskell
+- Day17/haskell
+- Day18/haskell
+- Day19/haskell
+- Day20/haskell
+- Day21/haskell
+- Day22/haskell
+- Day23/haskell
+- Day24/haskell
+- Day25/haskell
 # Dependency packages to be pulled from upstream that are not in the resolver.
 # These entries can reference officially published versions as well as
 # forks / in-progress versions pinned to a git hash. For example:
