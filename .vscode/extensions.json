@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "editorconfig.editorconfig",
+        "ms-dotnettools.csharp",
+        "ionide.ionide-fsharp",
+        "mogeko.haskell-extension-pack"
+    ]
+}
