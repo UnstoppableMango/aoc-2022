@@ -6,6 +6,7 @@
         "mogeko.haskell-extension-pack",
         "rust-lang.rust-analyzer",
         "golang.go",
-        "vscjava.vscode-java-pack"
+        "vscjava.vscode-java-pack",
+        "denoland.vscode-deno"
     ]
 }
