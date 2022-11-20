@@ -1,9 +1,9 @@
 SHELL       := /bin/bash
 DAYS        := $(shell ls | grep Day)
 
-.PHONY:: $(DAYS) all dotnet csharp fsharp haskell
+.PHONY:: $(DAYS) all dotnet csharp fsharp haskell rust
 
-all::	dotnet haskell
+all::	dotnet haskell rust
 
 dotnet::
 	dotnet build aoc-2022.sln
@@ -16,6 +16,9 @@ fsharp::
 
 haskell::
 	stack build
+
+rust::
+	cargo build
 
 $(DAYS)::
 	dotnet run --project $@/fsharp
