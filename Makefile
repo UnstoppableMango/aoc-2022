@@ -3,7 +3,7 @@ DAYS        := $(shell ls | grep Day)
 
 .PHONY:: $(DAYS) all clean dotnet csharp fsharp haskell rust java
 
-all::	dotnet haskell rust
+all::	dotnet haskell rust java
 
 clean::
 	dotnet clean aoc-2022.sln

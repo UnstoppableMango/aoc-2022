@@ -18,6 +18,7 @@ To build solutions for a specific language run
 make fsharp
 make csharp
 make haskell
+# ... etc
 ```
 
 ## Running
