@@ -3,6 +3,7 @@
         "editorconfig.editorconfig",
         "ms-dotnettools.csharp",
         "ionide.ionide-fsharp",
-        "mogeko.haskell-extension-pack"
+        "mogeko.haskell-extension-pack",
+        "rust-lang.rust-analyzer"
     ]
 }
