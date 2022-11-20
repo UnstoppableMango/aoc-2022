@@ -4,6 +4,8 @@
         "ms-dotnettools.csharp",
         "ionide.ionide-fsharp",
         "mogeko.haskell-extension-pack",
-        "rust-lang.rust-analyzer"
+        "rust-lang.rust-analyzer",
+        "golang.go",
+        "vscjava.vscode-java-pack"
     ]
 }
