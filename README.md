@@ -2,7 +2,15 @@
 
 Advent of Code 2022 solutions primarily in F#.
 
-Some days have solutions in other languages just for fun.
+Some days may have solutions in other languages, just for fun.
+
+## Running
+
+To run the primary solution for a particular day, run
+
+```shell
+make Day01
+```
 
 ## Building
 
@@ -19,12 +27,4 @@ make fsharp
 make csharp
 make haskell
 # ... etc
-```
-
-## Running
-
-To run the F# solution for a particular day, run
-
-```shell
-make Day01
 ```
