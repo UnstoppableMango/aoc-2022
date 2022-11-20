@@ -3,7 +3,9 @@ DAYS        := $(shell ls | grep Day)
 
 .PHONY:: $(DAYS) all clean dotnet csharp fsharp haskell rust java
 
-all::	dotnet haskell rust java
+# Execute `java` before `rust` because `mvn clean` will remove the rust target/ dir.
+# Skipping the parent pom `clean` goal should fix this, but I can't figure out how to do it.
+all::	dotnet haskell java rust
 
 clean::
 	dotnet clean aoc-2022.sln
