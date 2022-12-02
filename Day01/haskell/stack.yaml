@@ -4,4 +4,5 @@ resolver: ghc-9.4.2
 packages:
 - .
 # Dependency packages to be pulled from upstream that are not in the resolver.
-# extra-deps: []
+extra-deps:
+- split-0.2.3.5
