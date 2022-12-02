@@ -1,8 +1,6 @@
 ﻿open System
 open System.IO
 
-let input = File.ReadLines "input.txt"
-
 let accumulate acc x =
     match String.IsNullOrWhiteSpace x with
     | true -> []::acc
@@ -22,5 +20,6 @@ let part2 input =
     |> Seq.take 3
     |> Seq.sum
 
+let input = File.ReadLines "input.txt"
 part1 input |> Console.WriteLine
 part2 input |> Console.WriteLine
