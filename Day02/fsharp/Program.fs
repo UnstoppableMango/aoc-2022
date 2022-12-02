@@ -11,11 +11,10 @@ type Throw =
     | Paper
     | Scissors
 
-type Game = { Player: Throw; Opponent: Throw }
-type Strategy = { Opponent: Throw; Result: GameResult }
+let toTuple x = (Seq.head x, Seq.last x)
 
-let toThrow input =
-    match input with
+let toThrow =
+    function
     | "A" | "X" -> Rock
     | "B" | "Y" -> Paper
     | "C" | "Z" -> Scissors
@@ -28,19 +27,17 @@ let toGameResult =
     | "Z" -> Win
     | _ -> raise (InvalidOperationException())
 
-let getThrow strategy =
-    match (strategy.Opponent, strategy.Result) with
-    | Rock, Win | Paper, Tie | Scissors, Lose -> Paper
-    | Rock, Tie | Paper, Lose | Scissors, Win -> Rock
-    | Rock, Lose | Paper, Win | Scissors, Tie -> Scissors
+let winner =
+    function
+    | Rock -> Paper
+    | Paper -> Scissors
+    | Scissors -> Rock
 
-let toGame throws =
-    { Player = (Seq.last throws)
-      Opponent = (Seq.head throws) }
+let loser = winner >> winner
 
-let toStrategy input =
-    { Opponent = (Seq.head input |> toThrow)
-      Result = (Seq.last input |> toGameResult) }
+type Throw with
+    member x.losesTo y = (winner x) = y
+    member x.winsAgainst y = (loser x) = y
 
 let throwScore =
     function
@@ -54,30 +51,31 @@ let resultScore =
     | Tie -> 3
     | Lose -> 0
 
-let result game =
-    match (game.Player, game.Opponent) with
-    | Rock, Scissors | Paper, Rock | Scissors, Paper -> Win
-    | Rock, Rock | Paper, Paper | Scissors, Scissors -> Tie
-    | Scissors, Rock | Rock, Paper | Paper, Scissors -> Lose
+let gameResult =
+    function
+    | opponent, (player: Throw) when (player.losesTo opponent) -> player, Lose
+    | opponent, (player: Throw) when (player.winsAgainst opponent) -> player, Win
+    | opponent, _ -> opponent, Tie
 
-let gameScore game =
-    (throwScore game.Player) + (result game |> resultScore)
+let strategyResult =
+    function
+    | opponent, Win -> winner opponent, Win
+    | opponent, Tie -> opponent, Tie
+    | opponent, Lose -> loser opponent, Lose
 
-let strategyScore strategy =
-    (resultScore strategy.Result) + (getThrow strategy |> throwScore)
+let score (player, result) = (throwScore player) + (resultScore result)
 
 let part1 (input: string seq) =
     input
     |> Seq.map (fun x -> x.Split(' '))
-    |> Seq.map ((Seq.map toThrow) >> toGame)
-    |> Seq.map gameScore
+    |> Seq.map ((Seq.map toThrow) >> toTuple >> gameResult >> score)
     |> Seq.sum
 
 let part2 (input: string seq) =
     input
     |> Seq.map (fun x -> x.Split(' '))
-    |> Seq.map toStrategy
-    |> Seq.map strategyScore
+    |> Seq.map toTuple
+    |> Seq.map ((fun (x, y) -> (toThrow x, toGameResult y)) >> strategyResult >> score)
     |> Seq.sum
 
 let input = File.ReadLines "input.txt"
