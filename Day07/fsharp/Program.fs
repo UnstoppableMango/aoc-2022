@@ -4,6 +4,16 @@ open System.Text.Json
 
 let serializerOptions = JsonSerializerOptions(WriteIndented = true)
 
+type Node =
+    { Name: string
+      Size: int option
+      Children: Node list }
+
+let emptyNode =
+    { Name = ""
+      Size = None
+      Children = [] }
+
 type Line =
     | Cd of string
     | Ls
@@ -31,15 +41,9 @@ let tryAdd (a: int) (b: int option) =
     | Some x -> Some (a + x)
     | None -> Some a
 
-let combinePath dir name =
-    if dir = "/" then
-        $"/{name}"
-    else
-        $"{dir}/{name}"
-
-let build (map: Map<string, int>, dir: string) (cur: Line) =
-    match cur with
-    | Ls -> (map, dir)
+let build (cur: Node, parent: Node, children: Node list) (line: Line) =
+    match line with
+    | Ls -> (cur, parent, children)
     | Cd arg ->
         match arg with
         | "/" -> (map, "/")
@@ -51,7 +55,8 @@ let build (map: Map<string, int>, dir: string) (cur: Line) =
 let part1 input =
     input
     |> Seq.map parse
-    |> Seq.fold build (Map.empty, "/") |> fst
+    |> Seq.fold build (emptyNode, emptyNode, [])
+    |> fun cur parent children -> cur
     // |> Seq.map (fun x ->
     //     match x with
     //     | Cd cd -> $"cd {cd}"
