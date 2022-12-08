@@ -4,16 +4,6 @@ open System.Text.Json
 
 let serializerOptions = JsonSerializerOptions(WriteIndented = true)
 
-type Node =
-    { Name: string
-      Size: int option
-      Children: Node list }
-
-let emptyNode =
-    { Name = ""
-      Size = None
-      Children = [] }
-
 type Line =
     | Cd of string
     | Ls
@@ -41,31 +31,40 @@ let tryAdd (a: int) (b: int option) =
     | Some x -> Some (a + x)
     | None -> Some a
 
-let build (cur: Node, parent: Node, children: Node list) (line: Line) =
+let allParents (dirs: string list) =
+    dirs
+    |> List.mapi (fun i _ -> dirs[i..])
+
+let addSize size (sizes: Map<string list, int>) (cur: string list) =
+    sizes.Change(cur, tryAdd size)
+
+let build (sizes: Map<string list, int>, cur: string list) (line: Line) =
     match line with
-    | Ls -> (cur, parent, children)
+    | Ls -> (sizes, cur)
     | Cd arg ->
         match arg with
-        | "/" -> (map, "/")
-        | ".." -> (map, dir.Substring(0, dir.LastIndexOf('/')))
-        | name -> (map, combinePath dir name)
-    | Dir name -> (map.Add((combinePath dir name), 0), dir)
-    | File (size, name) -> (map.Change(dir, tryAdd size), dir)
+        | ".." -> (sizes, cur |> List.tail)
+        | name -> (sizes, name :: cur)
+    | Dir name -> (sizes.Add(name :: cur, 0), cur)
+    | File (size, name) -> ((cur |> allParents |> List.fold (addSize size) sizes), cur)
 
 let part1 input =
     input
     |> Seq.map parse
-    |> Seq.fold build (emptyNode, emptyNode, [])
-    |> fun cur parent children -> cur
-    // |> Seq.map (fun x ->
-    //     match x with
-    //     | Cd cd -> $"cd {cd}"
-    //     | Ls -> "ls"
-    //     | Dir dir -> $"dir {dir}"
-    //     | File (size, name) -> $"size: {size}, name: {name}")
-    |> fun x -> JsonSerializer.Serialize(x, serializerOptions)
+    |> Seq.fold build (Map.empty, [])
+    |> fst
+    |> Map.values
+    |> Seq.filter (fun x -> x <= 100_000)
+    |> Seq.sum
 
-let part2 input = 14
+let part2 input =
+    input
+    |> Seq.map parse
+    |> Seq.fold build (Map.empty, [])
+    |> fst
+    |> fun m -> (30_000_000 - (70_000_000 - m.Item ["/"]), m)
+    |> fun (r, m) -> m.Values |> Seq.filter ((<) r)
+    |> Seq.min
 
 let input = File.ReadLines "input.txt"
 input |> part1 |> Console.WriteLine
