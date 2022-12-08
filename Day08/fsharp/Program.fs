@@ -4,95 +4,67 @@ open System.Text.Json
 
 let serializerOptions = JsonSerializerOptions(WriteIndented = true)
 
-type Visibility =
-    | Left
-    | Right
-    | Top
-    | Bottom
+let solve (visibilities: Map<int * int, bool>) (input: seq<seq<(int * int) * int>>) =
+    let foldInner (v: Map<int * int, bool>, t: int) (i: int * int, c: int) =
+        let visible = c > t
 
-type Visibilities = Map<int * int, Visibility list>
+        let add o =
+            match o with
+            | Some x -> Some(x || visible)
+            | None -> Some visible
 
-// let addVisibility (shouldAdd: bool) (direction: Visibility) (xs: Visibility list option) =
-//     if shouldAdd then
-//         match xs with
-//         | Some l -> Some (direction :: l)
-//         | None -> Some [ direction ]
-//     else
-//         xs
+        (v.Change(i, add), max c t)
 
-let combineMap (acc: Visibilities) (row: seq<(int * int) * Visibility option>) : Visibilities =
-    let add v l =
-        match (v, l) with
-        | Some x, Some xs -> Some(x :: xs)
-        | Some x, None -> Some [ x ]
-        | None, _ -> l
+    let fold (v: Map<int * int, bool>) (c: seq<(int * int) * int>) = c |> Seq.fold foldInner (v, 0) |> fst
 
-    row |> Seq.fold (fun inner (i, v) -> inner.Change(i, add v)) acc
+    input |> Seq.fold fold visibilities
 
-// let visible (direction: Visibility) (acc: Visibilities, tallest: int) (index: int * int, cur: int) =
-//     (acc.Change(index, (addVisibility (cur > tallest) direction)), max cur tallest)
-
-let mapVisible (direction: Visibility) (t: int) (i: int * int, c: int) =
-    let visibility = if c > t then Some direction else None
-    ((i, visibility), max c t)
-
-// let leftVisible = visible Left
-// let rightVisible = visible Right
-// let topVisible = visible Top
-// let bottomVisible = visible Bottom
-
-// let mapVisible (direction: Visibility) (row: int seq) =
-//     row |> Seq.mapFold (fun (col, tallest) cur ->
-//         let v = if cur > tallest then Some direction else None
-//         (v, (col + 1, max cur tallest))) (0, 0)
-
-let solve (direction: Visibility) (visibilities: Visibilities) (input: seq<seq<(int * int) * int>>) =
-    input
-    |> Seq.map (Seq.mapFold (mapVisible direction) 0)
-    |> Seq.map fst
-    |> Seq.fold combineMap visibilities
-
-let part1 (input: int seq seq) =
+let part1 (input: int list list) =
+    let numRows = Seq.length input
+    let numCols = Seq.head input |> Seq.length
     let indexed = input |> Seq.mapi (fun r -> Seq.mapi (fun c x -> ((r, c), x)))
-    let mutable visibilities: Visibilities = Map.empty
-    visibilities <- indexed |> solve Left visibilities
-    visibilities <- indexed |> Seq.map Seq.rev |> solve Right visibilities
-    visibilities <- indexed |> Seq.transpose |> solve Bottom visibilities
-    visibilities <- indexed |> Seq.transpose |> Seq.map Seq.rev |> solve Top visibilities
+    let mutable visibilities = Map.empty
+    visibilities <- indexed |> solve visibilities
+    visibilities <- indexed |> Seq.map Seq.rev |> solve visibilities
+    visibilities <- indexed |> Seq.transpose |> solve visibilities
+    visibilities <- indexed |> Seq.transpose |> Seq.map Seq.rev |> solve visibilities
 
     visibilities
-    |> Map.map (fun k v ->
-        match k with
-        | 0, _ -> true
-        | _, 0 -> true
-        | _ -> v.Length > 0)
-    |> Map.values
+    |> Seq.map (fun kvp ->
+        match kvp.Key with
+        | r, _ when r = 0 || r = numRows - 1 -> true
+        | _, c when c = 0 || c = numCols - 1 -> true
+        | _ -> kvp.Value)
     |> Seq.sumBy (fun x -> if x then 1 else 0)
-// --------------------------------------------------------------
-// let left = indexed |> Seq.map (Seq.fold leftVisible (Map.empty, 0)) |> Seq.map fst |> Seq.reduce combineMap
-// left
-// --------------------------------------------------------------
-// let left = input |> Seq.map (mapVisible Left) |> Seq.map fst
-// let right = input |> Seq.map Seq.rev |> Seq.map (mapVisible Right) |> Seq.map fst
-// let bottom = input |> Seq.transpose |> Seq.map Seq.rev |> Seq.map ((mapVisible Bottom) >> fst) |> Seq.transpose
-// let top = input |> Seq.transpose |> Seq.map ((mapVisible Top) >> fst) |> Seq.transpose
-// left |> Seq.head |> Seq.zip (right |> Seq.head)
 
-let part2 input = 69
+let part2 (input: int list list) =
+    let arr = array2D input
 
-let testInput =
-    [ [ 3; 0; 3; 7; 3 ]
-      [ 2; 5; 5; 1; 2 ]
-      [ 6; 5; 3; 3; 2 ]
-      [ 3; 3; 5; 4; 9 ]
-      [ 3; 5; 3; 9; 0 ] ]
+    let sonic (row: int) (col: int) (x: int) =
+        let count v =
+            v
+            |> Array.tryFindIndex (fun i -> i >= x)
+            |> function
+                | Some i -> i + 1
+                | None -> Array.length v
 
-testInput
-|> List.map List.toSeq
-|> List.toSeq
+        let left = arr[row, .. col - 1] |> Array.rev |> count
+        let right = arr[row, col + 1 ..] |> count
+        let top = arr[.. row - 1, col] |> Array.rev |> count
+        let bottom = arr[row + 1 .., col] |> count
+
+        left * right * top * bottom
+
+    input |> List.mapi (fun r -> List.mapi (sonic r)) |> List.collect id |> List.max
+
+let input = File.ReadLines "input.txt" |> Seq.toList
+
+input
+|> List.map (Seq.map (Char.GetNumericValue >> int) >> Seq.toList)
 |> part1
-|> fun x -> JsonSerializer.Serialize(x, serializerOptions) |> Console.WriteLine
+|> Console.WriteLine
 
-let input = File.ReadLines "input.txt"
-// input |> Seq.map (Seq.map (Char.GetNumericValue >> int)) |> part1 |> JsonSerializer.Serialize |> Console.WriteLine
-// input |> Seq.map (Seq.map (Char.GetNumericValue >> int)) |> part2 |> Console.WriteLine
+input
+|> List.map (Seq.map (Char.GetNumericValue >> int) >> Seq.toList)
+|> part2
+|> Console.WriteLine
