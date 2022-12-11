@@ -1,16 +1,14 @@
 ﻿open System
 open System.IO
 
-let solve size (input: string) =
-    input
-    |> Seq.windowed size
-    |> Seq.map Set
-    |> Seq.findIndex (fun x -> x.Count = size)
-    |> fun x -> x + size
+let solve size =
+    Seq.windowed size
+    >> Seq.findIndex (Set >> Set.count >> (=) size)
+    >> (+) size
 
 let part1 = solve 4
 let part2 = solve 14
 
-let input = File.ReadLines "input.txt"
-input |> Seq.exactlyOne |> part1 |> Console.WriteLine
-input |> Seq.exactlyOne |> part2 |> Console.WriteLine
+let input = File.ReadAllText "input.txt"
+input |> part1 |> Console.WriteLine
+input |> part2 |> Console.WriteLine

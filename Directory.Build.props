@@ -1,5 +1,5 @@
 <Project>
   <ItemGroup>
-    <None Include="../input.txt" CopyToOutputDirectory="always" />
+    <None Include="../input.txt" CopyToOutputDirectory="Always" />
   </ItemGroup>
 </Project>
