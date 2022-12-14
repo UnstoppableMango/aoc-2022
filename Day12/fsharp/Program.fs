@@ -1,6 +1,5 @@
 ﻿open System
 open System.IO
-open System.Text.Json
 open System.Threading
 
 type Tile =
@@ -117,21 +116,22 @@ let rec bfs2 graph =
         | { Height = 0; Tile = Terrain } -> [trace] @ (List.map snd xs)
         | _ ->
             let c = children2 n graph
-            // plot graph
+            plot graph
             let q = c |> List.map (fun x -> x, n::trace)
             bfs2 (List.foldBack setExplored c graph) (xs @ q)
 
 let part1 (input: Node list list) =
     let start = input |> List.pick (List.tryFind isStart)
-    let path = bfs input [start, List.empty<Node>]
-    // plotPath input path
-    path |> List.length
+
+    bfs input [start, List.empty<Node>]
+    |> List.length
 
 let part2 (input: Node list list) =
     let start = input |> List.pick (List.tryFind isEnd)
-    let path = bfs2 input [start, List.empty<Node>]
-    // path |> List.map List.length
-    path |> List.minBy List.length |> List.length
+
+    bfs2 input [start, List.empty<Node>]
+    |> List.minBy List.length
+    |> List.length
 
 let input = File.ReadLines "input.txt" |> parse
 
