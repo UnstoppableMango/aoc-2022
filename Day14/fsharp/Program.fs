@@ -1,14 +1,15 @@
-﻿open System
+open System
 open System.IO
 open System.Text.Json
 
 type Index = int * int
 
-let numRows = 180
-let numCols = 200
+let numRows = 163
+let numCols = 110
 let numCells = numRows * numCols
+let midX = numCols - (numCols / 4) * 3
 let toRow i = i / numCols
-let toCol i = i % numRows
+let toCol i = i % numCols
 
 let isRock (r: int, c: int) ((sx: int, sy: int), (ex: int, ey: int)) =
     if sx <> ex && sy <> ey then
@@ -19,12 +20,12 @@ let isRock (r: int, c: int) ((sx: int, sy: int), (ex: int, ey: int)) =
 
     plotCol && plotRow
 
-let scale ((sx: int, sy: int), (ex: int, ey: int)) =
-    let scaleX x = (x - 500) + (numCols / 2)
+let translate ((sx: int, sy: int), (ex: int, ey: int)) =
+    let moveX x = (x - 500) + midX
 
     ((scaleX sx, sy), (scaleX ex, ey))
 
-let shouldPlot point line = isRock point (scale line)
+let shouldPlot point line = isRock point (translate line)
 
 let graph (routes: (Index * Index)[] seq) =
     let folder (a: Map<Index, char>) (i: int) =
@@ -58,23 +59,10 @@ let parse =
         |> Array.map (fun x -> (Array.head x, Array.last x)))
     >> Seq.map Array.pairwise<Index>
 
-let part1 input =
-    input
-    |> graph
-    |> plot
+let part1 input = input |> graph |> plot
 
 let part2 = id
 
 let input = File.ReadLines "input.txt" |> parse
-// input |> part1 |> Console.WriteLine
-// input |> part2 |> Console.WriteLine
-
-
-let numRows2 = 10
-let numCols2 = 5
-
-let toRow2 i = i / numCols2
-let toCol2 i = i % numRows2
-
-let tests = [4; 6; 10; 11; 12; 23; 25]
-tests |> Seq.iter (fun x -> Console.WriteLine $"i: {x}, ({toRow2 x}, {toCol2 x})")
+input |> part1 |> Console.WriteLine
+input |> part2 |> Console.WriteLine
