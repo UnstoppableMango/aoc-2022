@@ -1,5 +1,6 @@
 ﻿open System
 open System.IO
+open Shared
 
 type GameResult =
     | Win
@@ -18,14 +19,18 @@ let toThrow =
     | "A" | "X" -> Rock
     | "B" | "Y" -> Paper
     | "C" | "Z" -> Scissors
-    | _ -> raise (InvalidOperationException())
+    | x -> failwith $"Unexpected throw {x}"
 
 let toGameResult =
     function
     | "X" -> Lose
     | "Y" -> Tie
     | "Z" -> Win
-    | _ -> raise (InvalidOperationException())
+    | x -> failwith $"Unexpected result {x}"
+
+let parse snd x =
+    let parts = xString.split ' ' x
+    toThrow parts[0], snd parts[1]
 
 let winner =
     function
@@ -65,19 +70,11 @@ let strategyResult =
 
 let score (player, result) = (throwScore player) + (resultScore result)
 
-let part1 (input: string seq) =
-    input
-    |> Seq.map (fun x -> x.Split(' '))
-    |> Seq.map ((Seq.map toThrow) >> toTuple >> gameResult >> score)
-    |> Seq.sum
+let solve into calculate = Seq.map (parse into >> calculate >> score) >> Seq.sum
 
-let part2 (input: string seq) =
-    input
-    |> Seq.map (fun x -> x.Split(' '))
-    |> Seq.map toTuple
-    |> Seq.map ((fun (x, y) -> (toThrow x, toGameResult y)) >> strategyResult >> score)
-    |> Seq.sum
+let part1 = solve toThrow gameResult
+let part2 = solve toGameResult strategyResult
 
 let input = File.ReadLines "input.txt"
-part1 input |> Console.WriteLine
-part2 input |> Console.WriteLine
+input |> part1 |> Console.WriteLine
+input |> part2 |> Console.WriteLine

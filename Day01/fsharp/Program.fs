@@ -1,25 +1,16 @@
 ﻿open System
 open System.IO
 
-let accumulate acc x =
-    match String.IsNullOrWhiteSpace x with
-    | true -> []::acc
-    | false -> (x::(List.head acc))::(List.tail acc)
+let folder (cur: int, all: int list) (i: string) =
+    match Int32.TryParse i with
+    | true, x -> (x + cur, all)
+    | _ -> (0, cur :: all)
 
-let part1 input =
-    input
-    |> Seq.fold accumulate [[]]
-    |> Seq.map ((Seq.map Int32.Parse) >> Seq.sum)
-    |> Seq.max
+let sumAll = Seq.fold folder (0, []) >> snd
 
-let part2 input =
-    input
-    |> Seq.fold accumulate [[]]
-    |> Seq.map ((Seq.map Int32.Parse) >> Seq.sum)
-    |> Seq.sortDescending
-    |> Seq.take 3
-    |> Seq.sum
+let part1 = sumAll >> Seq.max
+let part2 = sumAll >> Seq.sortDescending >> Seq.take 3 >> Seq.sum
 
 let input = File.ReadLines "input.txt"
-part1 input |> Console.WriteLine
-part2 input |> Console.WriteLine
+input |> part1 |> Console.WriteLine
+input |> part2 |> Console.WriteLine
