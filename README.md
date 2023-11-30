@@ -1,5 +1,7 @@
 # Advent of Code 2022
 
+*!NOTE!* This repo has moved to [UnstoppableMango/advent-of-code](https://github.com/UnstoppableMango/advent-of-code/tree/main/src/2022)
+
 Advent of Code 2022 solutions primarily in F#.
 
 Some days may have solutions in other languages, just for fun.
